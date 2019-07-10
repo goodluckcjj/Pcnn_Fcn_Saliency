@@ -6,24 +6,24 @@ close all;
 ims = dir('../tmp2/*.png*');
 path_dm = '../tmp2';
 path_im = '../../input';
-path_pcnn = '../tmp1';
+path_weight = '../tmp1';
 path_out = '../../output';
 
 Thres = 100/255;
-GAMMA = 0.9;
+GAMMA = 0.8;
 
-
+print('Saliency refinement.')
 for i = 1:length(ims)
     IMAGE = ims(i).name;
     DM_input = imread(fullfile(path_dm,IMAGE));
-    PCNN_input = imread(fullfile(path_pcnn,IMAGE));
+    weight_input = imread(fullfile(path_weight,IMAGE));
     image_input = imread(fullfile(path_im,strrep(IMAGE,'.png','.jpg')));
     [LEN,WID] = size(DM_input);
     num_pixel = numel(DM_input);
     
     % Fusion Method
     DM = im2double(DM_input);
-    SEG = im2double(PCNN_input);
+    SEG = im2double(weight_input);
     
     MASK = (DM > 50/255);
     MASK = imfill(MASK,'holes');
@@ -53,7 +53,10 @@ for i = 1:length(ims)
     Image_Fusion = Image_Fusion/max(max(Image_Fusion));
 %     Image_Fusion = (Image_Fusion > 1) + Image_Fusion.*(Image_Fusion <= 1);
     Image_Fusion = imfill(Image_Fusion,'holes');
-    
+    delete(fullfile(path_dm,IMAGE));
+    delete(fullfile(path_weight,IMAGE));
+    delete(fullfile('../tmp',strrep(IMAGE,'.png','.jpg')));
+
     % calculate area coincide
     coincide = MASK.*( (Image_Fusion > Thres) == MASK );    
     if sum(sum(coincide))/sum(sum(MASK)) < 0.8
@@ -92,3 +95,8 @@ for i = 1:length(ims)
     imwrite(Image_Fusion_smooth,fullfile(path_out,IMAGE));
 
 end
+
+rmdir(path_dm);
+rmdir(path_weight);
+rmdir('../tmp');
+

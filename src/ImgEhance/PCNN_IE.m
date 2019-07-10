@@ -18,6 +18,7 @@ THETA = 0.7;
 
 if ~exist(path_out,'dir')
    mkdir(path_out);
+   mkdir([path_out,'1']);
 end
 
 h=waitbar(0,'processing');  
@@ -29,6 +30,11 @@ v_theta = 20;
 W = [ 0.5 1 0.5;
       1   0   1;
       0.5 1 0.5 ];
+W_sp = [0 0 0.5 0 0;
+        0 0.5 1 0.5 0;
+        0.5 1 0 1 0.5;
+        0 0.5 1 0.5 0;
+        0 0 0.5 0 0];
 
 for i = 1:length(ims)
     
@@ -196,13 +202,14 @@ for ii = 1:numlabels
     end
 end
 
-out_name = strrep(ims(i).name,'.jpg','_pcnn.png');
+out_name = strrep(ims(i).name,'.jpg','.png');
 Final_weight = THETA+(1-THETA)*PCNN_smooth;
 out = zeros(LEN,WID,3);
 for ii=1:3
     out(:,:,ii) = double(Data_input(:,:,ii)).*Final_weight;
 end
 imwrite(uint8(out), fullfile(path_out,ims(i).name));
+imwrite(uint8(255*PCNN_smooth), fullfile([path_out,'1'],out_name))
 
 info=[num2str(i/length(ims)*100),'%...'];
 waitbar(i/length(ims),h,info)

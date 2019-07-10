@@ -23,8 +23,8 @@ transformer.set_transpose('data', (2,0,1))
 transformer.set_raw_scale('data', 255)  
 transformer.set_channel_swap('data', (2,1,0))  
 
-if not os.path.exists(imgpath + 'result'):
-    os.makedirs(imgpath + 'result')
+if not os.path.exists('../tmp2'):
+    os.makedirs('../tmp2')
 
 print 'Starting coarse predictions:'
 count = 1
@@ -39,7 +39,7 @@ for img in imgs:
     map_final /= map_final.max()
     map_final = np.ceil(map_final*255)
     name = imm.replace(".jpg", ".png")
-    imgname = imgpath + 'result' + name
+    imgname = '../tmp2' + name
     cv2.imwrite(imgname, map_final)
     count += 1
     if count%100==0:
